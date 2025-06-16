@@ -1,0 +1,220 @@
+.printings-list{
+  max-height: 30vh; 
+  min-height: 10vh;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.card-detail-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px; 
+}
+
+.parent-card-details,
+.printings-list-section,
+.printings-actions-section {
+  margin-top: 15px; 
+  padding: 0;
+  font-size: 0.9em;
+}
+/* Spécificité pour les cartes sombres */
+.card-detail-item.type-xyz-monster .parent-card-details,
+.card-detail-item.type-xyz-monster .printings-list-section,
+.card-detail-item.type-xyz-monster .printings-actions-section,
+.card-detail-item.type-link-monster .parent-card-details,
+.card-detail-item.type-link-monster .printings-list-section,
+.card-detail-item.type-link-monster .printings-actions-section {
+  border-top: 1px solid rgba(255,255,255,0.2);
+  background-color: rgba(0,0,0,0.1);
+}
+
+
+.printings-actions-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px; 
+}
+
+.printings-actions-section button {
+  padding: 6px 10px; 
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  font-size: 0.85em;
+  color: #333; /* Couleur de texte par défaut pour les boutons */
+}
+.printings-actions-section button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.printings-list-section h4 {
+  margin-bottom: 8px;
+  font-size: 1.1em; 
+  display: flex;
+  gap: 12px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.printing-item-container { 
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 5px; 
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+.card-detail-item.type-xyz-monster .printing-item-container,
+.card-detail-item.type-link-monster .printing-item-container {
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.printing-item-container:last-child {
+  border-bottom: none;
+}
+
+.printing-link-column {
+  flex-shrink: 0; 
+  display: flex;
+  flex-direction: column; 
+  gap: 4px;
+}
+
+.printing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 0.85em;
+  flex-wrap: wrap; 
+  flex-grow: 1; 
+  flex-direction: column;
+  align-content: flex-start;
+}
+
+.printing-info {
+ flex-grow: 1; 
+ margin-right: 10px;
+ overflow: hidden;
+}
+
+.printing-info .set-name {
+  font-weight: bold; 
+}
+.printing-info .rarity-details {
+  font-size: 0.9em;
+  color: inherit; /* Hérite de la couleur du texte de la cardStyle */
+  opacity: 0.8;
+  display: block; 
+}
+
+.current-artwork-indicator { 
+  font-size: 0.9em;
+  margin-left: 10px;
+  font-weight: bold;
+  color: #1e88e5; 
+}
+
+.printing-collection-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+    flex-shrink: 0; 
+}
+
+.quantity-control-group {
+    display: flex;
+    align-items: center;
+    gap: 2px; 
+    padding: 3px 5px; 
+    border-radius: 3px; 
+}
+
+/* Couleurs de fond pour les groupes de quantité */
+.quantity-control-group.owned-control { background-color: #28a745; border-color: #1e7e34; } /* Vert */
+.quantity-control-group.wanted-control { background-color: #dc3545; border-color: #b02a37; } /* Rouge */
+.quantity-control-group.trade-control { background-color: #6f42c1; border-color: #59359a; } /* Violet */
+
+
+.quantity-label { 
+    display: none; 
+}
+
+.quantity-count {
+  font-size: 1.2em; 
+  font-weight: bold;
+  min-width: 22px; 
+  text-align: center;
+  padding: 0 2px;
+  color: white;
+}
+
+.quantity-button,
+.edit-details-button {
+    padding: 2px 6px !important; 
+    font-size: 0.9em !important; 
+    min-width: 22px; 
+    line-height: 1;
+    border-radius: 4px;
+    color: white; 
+    background-color: transparent !important; 
+}
+.quantity-button{
+  font-size: 1.5em !important; 
+}
+.edit-details-button {
+  padding: 6px 4px 5px !important;
+}
+.quantity-button:hover:not(:disabled),
+.edit-details-button:hover:not(:disabled) {
+    background-color: rgba(255,255,255,0.2) !important;
+}
+.quantity-button:disabled,
+.edit-details-button:disabled {
+    color: transparent !important; 
+    cursor: not-allowed;
+    display: none;
+}
+
+.edit-details-button {
+    margin-left: 3px; /* Espace après le bouton + */
+}
+
+
+.link-specific-button { 
+    color: white;
+    padding: 3px 6px !important; 
+    font-size: 1.2em !important;
+    min-width: auto;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.link-specific-button:hover:not(:disabled) {
+    background-color: #5a6268 !important;
+}
+.link-specific-button:disabled {
+    background-color: #adb5bd !important;
+    cursor: not-allowed;
+}
+
+
+.link-status-message-inline {
+    font-size: 0.8em;
+    font-style: italic;
+    color: #666;
+    margin-left: 5px;
+}
+
+.create-printing-button, .toggle-printings-button{
+  padding: 3px 15px 5px 15px;
+  background: rgb(0 0 0 / 50%);
+  border-radius: 3px;
+  cursor: pointer;
+}

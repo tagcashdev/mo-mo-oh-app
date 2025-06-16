@@ -1,0 +1,7 @@
+.card-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+  gap: 15px; 
+  padding: 10px 0; 
+  /* overflow-y: auto;  Supprimé, géré par .card-list-area */
+}

@@ -1,0 +1,128 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #171a21;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.main-content-with-filters {
+  flex-grow: 1;
+  display: flex; /* Pour positionner la galerie et la sidebar de filtres */
+  overflow: hidden; /* Empêche le scroll sur ce conteneur */
+}
+
+.main-gallery-area {
+  flex-grow: 1; /* La zone de la galerie prend l'espace disponible */
+  padding: 20px;
+  overflow-y: auto; /* Permet le scroll pour la galerie et l'importateur */
+  background-color: #171a21;
+  display: flex;
+  flex-direction: column; /* Empiler l'importateur et la liste de cartes */
+}
+
+.card-list-area {
+  background-color: #171a21;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex; 
+  flex-direction: column; 
+  flex-grow: 1; /* Permet à la liste de prendre la hauteur restante */
+}
+
+/* Styles pour la vue détaillée en modale */
+.card-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.card-detail-modal-content {
+  border-radius: 8px;
+  width: 100%;
+  max-width: 700px; /* Max width pour la modale */
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative; /* Pour le bouton de fermeture */
+  background-color: black;
+}
+
+.close-modal-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  width: 45px;
+  height: 45px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 10;
+  border-radius: 0 8px;
+  font-family: inherit;
+}
+.close-modal-button:hover {
+  background: rgb(128, 0, 0);
+}
+
+.pagination-controls {
+  margin-top: auto; 
+  padding-top: 20px; 
+  text-align: center;
+}
+
+.pagination-controls button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+.pagination-controls button:hover {
+  background-color: #3c3c3c;
+}
+.pagination-controls button:disabled {
+  background-color: #f8f8f8;
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+h2 {
+  color: #f8fafc;
+  margin-bottom: 20px;
+}
+
+.filters-search-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap; 
+}
+
+.card-grid-container {
+  overflow-y: auto; 
+}

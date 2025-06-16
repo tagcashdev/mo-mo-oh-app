@@ -1,0 +1,52 @@
+.filter-sidebar {
+  width: 280px; /* Largeur de la sidebar de filtres */
+  min-width: 280px;
+  background-color: #171a21;
+  border-left: 1px solid #dde2e7;
+  padding: 20px;
+  overflow-y: auto; /* Permet le scroll si les filtres sont nombreux */
+  height: 100vh; /* Prend toute la hauteur */
+  box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+}
+
+.filter-sidebar-header {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.filter-sidebar-header h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.2em;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #94a3b8; /* Couleur de label un peu plus douce */
+  font-size: 0.9em;
+}
+
+.filter-section select,
+.filter-section input[type="text"],
+.filter-section input[type="number"] {
+  width: calc(100% - 18px); /* Prend la largeur complète moins le padding du select/input */
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box; /* Assure que le padding ne dépasse pas la largeur */
+}
+
+.filter-section input[type="number"] {
+  width: calc(50% - 13px); /* Pour les inputs min/max côte à côte */
+  margin-right: 5px;
+}
+.filter-section input[type="number"]:last-child {
+  margin-right: 0;
+}

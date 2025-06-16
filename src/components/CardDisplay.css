@@ -1,0 +1,15 @@
+.detail-count-tag {
+  font-size: 0.9em;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 500;
+  margin: 0;
+}
+.detail-count-tag.owned { background-color: #28a745; } /* Vert */
+.detail-count-tag.wanted { background-color: #dc3545; } /* Rouge */
+.detail-count-tag.trade { background-color: #6f42c1; } /* Violet */
+
+.detail-count-tag span {
+  font-weight: bold;
+}
