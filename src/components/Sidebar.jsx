@@ -1,8 +1,8 @@
 import React from 'react';
 import './Sidebar.css';
 
-function Sidebar() {
-  const [activeLink, setActiveLink] = React.useState('Base de Données');
+function Sidebar({ activeView, setActiveView }) { 
+  //const [activeLink, setActiveLink] = React.useState('Base de Données');
   const navItems = [
     { name: 'Base de Données', icon: '🗃️' },
     { name: 'Ma Collection', icon: '📚' },
@@ -19,8 +19,8 @@ function Sidebar() {
       <nav className="sidebar-nav">
         <ul>
           {navItems.map(item => (
-            <li key={item.name} className={activeLink === item.name ? 'active' : ''}>
-              <a href="#" onClick={(e) => { e.preventDefault(); setActiveLink(item.name); /* Gérer la navigation ici */ }}>
+            <li key={item.name} className={activeView === item.name ? 'active' : ''}>
+              <a href="#" onClick={(e) => { e.preventDefault(); setActiveView(item.name); /* Gérer la navigation ici */ }}>
                 <span className="nav-icon">{item.icon}</span>
                 {item.name}
               </a>

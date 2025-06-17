@@ -228,18 +228,24 @@ function CardDetailView({ artworkInfo, onCollectionUpdated }) {
                     <span className="rarity-details">{p.rarity} - {p.language} {p.edition && `(${p.edition})`}</span>
                   </div>
                   <div className="printing-collection-controls">
-                    {/* Remplacer les 3 groupes de boutons par un seul bouton 'Editer' */}
+                    <div class="card-thumbnail-counters"> 
+                      <span class="count-tag owned ">{p.owned_count_for_this_printing || 0}</span>
+                      <span class="count-tag wanted ">{p.wanted_count_for_this_printing || 0}</span>
+                      <span class="count-tag trade ">{p.trade_count_for_this_printing || 0}</span>
+                    </div>
                     <button onClick={() => openEditModal(p)} className="edit-collection-button" title="Modifier la collection pour cette impression">
-                        x{p.owned_count_for_this_printing || 0} / x{p.wanted_count_for_this_printing || 0} / x{p.trade_count_for_this_printing || 0} 
                         <span className="edit-icon"> ✏️</span>
                     </button>
+
+                  </div>
+                </div>
+                <div className="printing-action-column">
                     <button onClick={() => handleOpenEditPrintingModal(p)} className="printing-action-button edit" title="Éditer les informations de cette impression (set, rareté...)">
                       ⚙️
                     </button>
                     <button onClick={() => handleDeletePrinting(p.printing_id, `${p.set_name} - ${p.card_number_in_set}`)} className="printing-action-button delete" title="Supprimer définitivement cette impression">
                       🗑️
                     </button>
-                  </div>
                 </div>
               </div>
             ))}

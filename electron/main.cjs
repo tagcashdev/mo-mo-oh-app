@@ -580,7 +580,7 @@ ipcMain.handle('get-alternate-artworks-for-card', async (event, cardId) => {
 });
 
 
-// NOUVEAU: Mettre à jour les détails d'une impression
+// Mettre à jour les détails d'une impression
 ipcMain.handle('update-card-printing', async (event, details) => {
   const { printing_id, set_id, card_number_in_set, rarity, language, edition, artwork_variant_id } = details;
   if (!printing_id || !set_id || !card_number_in_set || !rarity) {
@@ -606,7 +606,7 @@ ipcMain.handle('update-card-printing', async (event, details) => {
   }
 });
 
-// NOUVEAU: Supprimer une impression
+// Supprimer une impression
 ipcMain.handle('delete-card-printing', async (event, printingId) => {
   if (!printingId) {
     return { success: false, message: 'ID de l\'impression manquant.' };
@@ -625,5 +625,112 @@ ipcMain.handle('delete-card-printing', async (event, printingId) => {
   } catch (error) {
     console.error(`[IPC:delete-card-printing] Erreur pour printingId ${printingId}:`, error);
     return { success: false, message: `Erreur de base de données: ${error.message}` };
+  }
+});
+
+// Pour récupérer tous les sets de la base de données
+ipcMain.handle("get-all-sets", async () => {
+  const db = getDb();
+  try {
+    // On récupère aussi le nombre de cartes imprimées pour chaque set
+    const stmt = db.prepare(`
+      SELECT 
+        s.*, 
+        (SELECT COUNT(*) FROM CardPrintings cp WHERE cp.set_id = s.id) as card_count
+      FROM Sets s 
+      ORDER BY s.release_date_tcg_na DESC, s.set_name ASC
+    `);
+    const sets = stmt.all();
+    return { success: true, data: sets };
+  } catch (error) {
+    console.error("[get-all-sets] Erreur:", error);
+    return { success: false, message: error.message, data: [] };
+  }
+});
+
+// Pour importer tous les sets et leurs impressions
+ipcMain.handle("import-all-sets-and-printings", async (event) => {
+  const mainWindow = BrowserWindow.getFocusedWindow();
+  const db = getDb();
+
+  function sendProgress(message, progress = null, total = null) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      // Nous utiliserons le même canal de progression pour simplifier
+      mainWindow.webContents.send("import-progress", { message, progress, total });
+    }
+    console.log(message);
+  }
+
+  sendProgress("Démarrage de l'importation des sets et impressions...");
+
+  try {
+    // 1. Récupérer tous les sets depuis l'API
+    sendProgress("Récupération de la liste complète des sets...");
+    const response = await fetch('https://db.ygoprodeck.com/api/v7/cardsets.php');
+    if (!response.ok) throw new Error('Impossible de récupérer la liste des sets.');
+    
+    const allApiSets = await response.json();
+    sendProgress(`${allApiSets.length} sets trouvés dans l'API.`);
+
+    const findSetStmt = db.prepare("SELECT id FROM Sets WHERE set_code = ?");
+    const insertSetStmt = db.prepare("INSERT INTO Sets (set_name, set_code, release_date_tcg_na, total_cards, set_type) VALUES (@set_name, @set_code, @tcg_date, @num_of_cards, 'Unknown')");
+    
+    // 2. Mettre à jour la table Sets
+    db.transaction(() => {
+        for (const set of allApiSets) {
+            const existingSet = findSetStmt.get(set.set_code);
+            if (!existingSet) {
+                insertSetStmt.run(set);
+            }
+        }
+    })();
+    sendProgress("Table 'Sets' mise à jour avec les nouvelles extensions.");
+
+    // 3. Boucler sur chaque set pour importer les impressions
+    let setsProcessed = 0;
+    const findCardByApiIdStmt = db.prepare("SELECT id FROM Cards WHERE api_card_id = ?");
+    const findPrintingStmt = db.prepare("SELECT id FROM CardPrintings WHERE card_id = ? AND set_id = ? AND card_number_in_set = ? AND rarity = ?");
+    const insertPrintingStmt = db.prepare("INSERT INTO CardPrintings (card_id, set_id, card_number_in_set, rarity, language) VALUES (?, ?, ?, ?, 'EN')");
+
+    for (const apiSet of allApiSets) {
+        setsProcessed++;
+        sendProgress(`Traitement du set ${setsProcessed}/${allApiSets.length}: ${apiSet.set_name}`);
+        
+        const setInDb = findSetStmt.get(apiSet.set_code);
+        if (!setInDb) continue; // Ne devrait pas arriver, mais par sécurité
+
+        const cardsInSetResponse = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(apiSet.set_name)}`);
+        if (!cardsInSetResponse.ok) {
+            sendProgress(`  -> Erreur lors de la récupération des cartes pour le set ${apiSet.set_name}, on continue.`);
+            continue;
+        }
+        const cardsData = await cardsInSetResponse.json();
+
+        if (cardsData.data) {
+            db.transaction(() => {
+                for (const card of cardsData.data) {
+                    const cardInDb = findCardByApiIdStmt.get(card.id);
+                    if (cardInDb) {
+                        const printingInfo = card.card_sets.find(s => s.set_name === apiSet.set_name);
+                        if (printingInfo) {
+                            const existingPrinting = findPrintingStmt.get(cardInDb.id, setInDb.id, printingInfo.set_code, printingInfo.set_rarity);
+                            if (!existingPrinting) {
+                                insertPrintingStmt.run(cardInDb.id, setInDb.id, printingInfo.set_code, printingInfo.set_rarity);
+                            }
+                        }
+                    }
+                }
+            })();
+        }
+        await new Promise(resolve => setTimeout(resolve, 50)); // Petite pause pour ne pas surcharger l'API
+    }
+
+    sendProgress("Importation de toutes les impressions terminée !");
+    return { success: true, message: "Tous les sets et impressions ont été vérifiés et importés." };
+
+  } catch (error) {
+    console.error("Erreur majeure lors de l'importation des sets:", error);
+    sendProgress(`Erreur critique d'importation : ${error.message}`);
+    return { success: false, message: error.message };
   }
 });

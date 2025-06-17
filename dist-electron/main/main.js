@@ -3844,12 +3844,12 @@ const isSameProtocol = function isSameProtocol2(destination, original) {
   const dest = new URL$1$1(destination).protocol;
   return orig === dest;
 };
-function fetch(url, opts) {
-  if (!fetch.Promise) {
+function fetch$1(url, opts) {
+  if (!fetch$1.Promise) {
     throw new Error("native promise missing, set fetch.Promise to your favorite alternative");
   }
-  Body.Promise = fetch.Promise;
-  return new fetch.Promise(function(resolve, reject) {
+  Body.Promise = fetch$1.Promise;
+  return new fetch$1.Promise(function(resolve, reject) {
     const request = new Request(url, opts);
     const options = getNodeRequestOptions(request);
     const send = (options.protocol === "https:" ? https : http).request;
@@ -3920,7 +3920,7 @@ function fetch(url, opts) {
     req.on("response", function(res) {
       clearTimeout(reqTimeout);
       const headers = createHeadersLenient(res.headers);
-      if (fetch.isRedirect(res.statusCode)) {
+      if (fetch$1.isRedirect(res.statusCode)) {
         const location = headers.get("Location");
         let locationURL = null;
         try {
@@ -3982,7 +3982,7 @@ function fetch(url, opts) {
               requestOpts.body = void 0;
               requestOpts.headers.delete("content-length");
             }
-            resolve(fetch(new Request(locationURL, requestOpts)));
+            resolve(fetch$1(new Request(locationURL, requestOpts)));
             finalize();
             return;
         }
@@ -4074,10 +4074,10 @@ function destroyStream(stream, err) {
     stream.end();
   }
 }
-fetch.isRedirect = function(code) {
+fetch$1.isRedirect = function(code) {
   return code === 301 || code === 302 || code === 303 || code === 307 || code === 308;
 };
-fetch.Promise = global.Promise;
+fetch$1.Promise = global.Promise;
 const lib = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   AbortError,
@@ -4085,7 +4085,7 @@ const lib = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty(
   Headers,
   Request,
   Response,
-  default: fetch
+  default: fetch$1
 }, Symbol.toStringTag, { value: "Module" }));
 const require$$0 = /* @__PURE__ */ getAugmentedNamespace(lib);
 var dataImporter;
@@ -4872,6 +4872,91 @@ function requireMain() {
     } catch (error) {
       console.error(`[IPC:delete-card-printing] Erreur pour printingId ${printingId}:`, error);
       return { success: false, message: `Erreur de base de données: ${error.message}` };
+    }
+  });
+  ipcMain.handle("get-all-sets", async () => {
+    const db = getDb();
+    try {
+      const stmt = db.prepare(`
+      SELECT 
+        s.*, 
+        (SELECT COUNT(*) FROM CardPrintings cp WHERE cp.set_id = s.id) as card_count
+      FROM Sets s 
+      ORDER BY s.release_date_tcg_na DESC, s.set_name ASC
+    `);
+      const sets = stmt.all();
+      return { success: true, data: sets };
+    } catch (error) {
+      console.error("[get-all-sets] Erreur:", error);
+      return { success: false, message: error.message, data: [] };
+    }
+  });
+  ipcMain.handle("import-all-sets-and-printings", async (event) => {
+    const mainWindow2 = BrowserWindow.getFocusedWindow();
+    const db = getDb();
+    function sendProgress(message, progress = null, total = null) {
+      if (mainWindow2 && !mainWindow2.isDestroyed()) {
+        mainWindow2.webContents.send("import-progress", { message, progress, total });
+      }
+      console.log(message);
+    }
+    sendProgress("Démarrage de l'importation des sets et impressions...");
+    try {
+      sendProgress("Récupération de la liste complète des sets...");
+      const response = await fetch("https://db.ygoprodeck.com/api/v7/cardsets.php");
+      if (!response.ok) throw new Error("Impossible de récupérer la liste des sets.");
+      const allApiSets = await response.json();
+      sendProgress(`${allApiSets.length} sets trouvés dans l'API.`);
+      const findSetStmt = db.prepare("SELECT id FROM Sets WHERE set_code = ?");
+      const insertSetStmt = db.prepare("INSERT INTO Sets (set_name, set_code, release_date_tcg_na, total_cards, set_type) VALUES (@set_name, @set_code, @tcg_date, @num_of_cards, 'Unknown')");
+      db.transaction(() => {
+        for (const set of allApiSets) {
+          const existingSet = findSetStmt.get(set.set_code);
+          if (!existingSet) {
+            insertSetStmt.run(set);
+          }
+        }
+      })();
+      sendProgress("Table 'Sets' mise à jour avec les nouvelles extensions.");
+      let setsProcessed = 0;
+      const findCardByApiIdStmt = db.prepare("SELECT id FROM Cards WHERE api_card_id = ?");
+      const findPrintingStmt = db.prepare("SELECT id FROM CardPrintings WHERE card_id = ? AND set_id = ? AND card_number_in_set = ? AND rarity = ?");
+      const insertPrintingStmt = db.prepare("INSERT INTO CardPrintings (card_id, set_id, card_number_in_set, rarity, language) VALUES (?, ?, ?, ?, 'EN')");
+      for (const apiSet of allApiSets) {
+        setsProcessed++;
+        sendProgress(`Traitement du set ${setsProcessed}/${allApiSets.length}: ${apiSet.set_name}`);
+        const setInDb = findSetStmt.get(apiSet.set_code);
+        if (!setInDb) continue;
+        const cardsInSetResponse = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(apiSet.set_name)}`);
+        if (!cardsInSetResponse.ok) {
+          sendProgress(`  -> Erreur lors de la récupération des cartes pour le set ${apiSet.set_name}, on continue.`);
+          continue;
+        }
+        const cardsData = await cardsInSetResponse.json();
+        if (cardsData.data) {
+          db.transaction(() => {
+            for (const card of cardsData.data) {
+              const cardInDb = findCardByApiIdStmt.get(card.id);
+              if (cardInDb) {
+                const printingInfo = card.card_sets.find((s) => s.set_name === apiSet.set_name);
+                if (printingInfo) {
+                  const existingPrinting = findPrintingStmt.get(cardInDb.id, setInDb.id, printingInfo.set_code, printingInfo.set_rarity);
+                  if (!existingPrinting) {
+                    insertPrintingStmt.run(cardInDb.id, setInDb.id, printingInfo.set_code, printingInfo.set_rarity);
+                  }
+                }
+              }
+            }
+          })();
+        }
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      sendProgress("Importation de toutes les impressions terminée !");
+      return { success: true, message: "Tous les sets et impressions ont été vérifiés et importés." };
+    } catch (error) {
+      console.error("Erreur majeure lors de l'importation des sets:", error);
+      sendProgress(`Erreur critique d'importation : ${error.message}`);
+      return { success: false, message: error.message };
     }
   });
   return main$1;

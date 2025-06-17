@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // --- Importation ---
   importAllCards: () => ipcRenderer.invoke('import-all-cards'),
+  importAllSetsAndPrintings: () => ipcRenderer.invoke("import-all-sets-and-printings"),
+  getAllSets: () => ipcRenderer.invoke("get-all-sets"),
   onImportProgress: (callback) => {
     const handler = (_event, value) => callback(value);
     ipcRenderer.on('import-progress', handler);

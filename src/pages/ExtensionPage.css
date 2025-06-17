@@ -1,0 +1,43 @@
+/* src/pages/ExtensionPage.css */
+/* NOUVEAU FICHIER */
+
+.extension-page {
+    padding: 20px;
+    color: #f0f0f0;
+}
+
+.extension-header {
+    border-bottom: 1px solid #3c3c3c;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.extension-header h1 {
+    margin: 0;
+}
+
+.set-list-container {
+    margin-top: 20px;
+        height: 50vh;
+    overflow: auto;
+}
+
+.set-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.set-table th, .set-table td {
+    border: 1px solid #3c3c3c;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.set-table thead {
+    background-color: #2a2e37;
+}
+
+.set-table tbody tr:nth-child(odd) {
+    background-color: #1e2229;
+}

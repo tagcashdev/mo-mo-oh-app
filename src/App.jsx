@@ -6,6 +6,8 @@ import CardDetailView from './components/CardDetailView.jsx';
 import FilterSidebar from './components/FilterSidebar.jsx';
 import './App.css';
 
+import ExtensionPage from './pages/ExtensionPage.jsx';
+
 function App() {
   const [displayedArtworks, setDisplayedArtworks] = useState([]);
   const [selectedArtworkInfo, setSelectedArtworkInfo] = useState(null); 
@@ -15,6 +17,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCardType, setSelectedCardType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeView, setActiveView] = useState('Base de Données'); 
 
   const fetchArtworksForPage = useCallback(async (page, type, term) => {
     setIsLoading(true);
@@ -82,56 +85,70 @@ function App() {
     fetchArtworksForPage(currentPage, selectedCardType, searchTerm);
   }, [currentPage, selectedCardType, searchTerm, fetchArtworksForPage]);
 
-
-  return (
-    <div className="app-container">
-      <Sidebar />
-      <main className="main-content-with-filters">
-        <div className="main-gallery-area">
+  const renderActiveView = () => {
+    switch(activeView) {
+      case 'Extensions':
+        return <ExtensionPage />;
+      case 'Base de Données':
+      default:
+        return (
+          <div className="main-gallery-area">
             <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid #ddd' }}>
               <ButtonImporter />
             </div>
-            
             <div className="card-list-area">
               <h2 style={{marginTop: 0, marginBottom: '15px'}}>Galerie d'Artworks</h2>
-              {isLoading ? (
-                <p>Chargement des artworks...</p>
-              ) : (
-                <CardList 
-                  artworks={displayedArtworks} 
-                  onArtworkSelect={handleArtworkSelect} 
-                />
-              )}
-              {!isLoading && totalPages > 0 && displayedArtworks.length > 0 && (
-                <div className="pagination-controls">
-                  <button 
-                    onClick={() => handlePageChange(currentPage - 1)} 
-                    disabled={currentPage === 1}
-                  >
-                    Précédent
-                  </button>
-                  <span style={{ margin: '0 10px' }}>
-                    Page {currentPage} sur {totalPages}
-                  </span>
-                  <button 
-                    onClick={() => handlePageChange(currentPage + 1)} 
-                    disabled={currentPage === totalPages}
-                  >
-                    Suivant
-                  </button>
-                </div>
-              )}
-              {!isLoading && displayedArtworks.length === 0 && (searchTerm || selectedCardType) && (
-                  <p style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>Aucun artwork trouvé pour les filtres actuels.</p>
-              )}
+            {isLoading ? (
+              <p>Chargement des artworks...</p>
+            ) : (
+              <CardList 
+                artworks={displayedArtworks} 
+                onArtworkSelect={handleArtworkSelect} 
+              />
+            )}
+            {!isLoading && totalPages > 0 && displayedArtworks.length > 0 && (
+              <div className="pagination-controls">
+                <button 
+                  onClick={() => handlePageChange(currentPage - 1)} 
+                  disabled={currentPage === 1}
+                >
+                  Précédent
+                </button>
+                <span style={{ margin: '0 10px' }}>
+                  Page {currentPage} sur {totalPages}
+                </span>
+                <button 
+                  onClick={() => handlePageChange(currentPage + 1)} 
+                  disabled={currentPage === totalPages}
+                >
+                  Suivant
+                </button>
+              </div>
+            )}
+            {!isLoading && displayedArtworks.length === 0 && (searchTerm || selectedCardType) && (
+                <p style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>Aucun artwork trouvé pour les filtres actuels.</p>
+            )}
             </div>
-        </div>
-        <FilterSidebar
-          selectedCardType={selectedCardType}
-          searchTerm={searchTerm}
-          onCardTypeFilterChange={handleCardTypeFilterChange}
-          onSearchTermChange={handleSearchTermChange}
-        />
+          </div>
+        );
+    }
+  }
+
+  return (
+    <div className="app-container">
+      <Sidebar activeView={activeView} setActiveView={setActiveView} /> 
+
+      <main className="main-content-with-filters">
+        {renderActiveView()}
+
+        {activeView === 'Base de Données' && (
+          <FilterSidebar
+            selectedCardType={selectedCardType}
+            searchTerm={searchTerm}
+            onCardTypeFilterChange={handleCardTypeFilterChange}
+            onSearchTermChange={handleSearchTermChange}
+          />
+        )}
       </main>
 
       {selectedArtworkInfo && (

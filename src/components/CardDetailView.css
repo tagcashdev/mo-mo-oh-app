@@ -88,6 +88,38 @@
   gap: 4px;
 }
 
+.printing-action-column{
+  display: flex;
+  gap:6px;
+}
+
+.printing-action-column .printing-action-button {
+  padding: 3px 15px 5px 15px;
+  background: rgb(0 0 0 / 50%);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.printing-collection-controls .card-thumbnail-counters{
+  font-size: inherit;
+  gap: 5px;
+}
+
+.printing-collection-controls .card-thumbnail-counters .count-tag{
+  min-width: 35px;
+}
+
+.printing-collection-controls .edit-collection-button{
+  background-color: transparent;
+  padding: 0;
+}
+.printing-collection-controls .edit-collection-button .edit-icon{
+  padding: 2px 14px 4px 14px;
+  background: rgb(0 0 0 / 50%);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
 .printing-item {
   display: flex;
   justify-content: space-between;
