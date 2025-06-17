@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import CardDisplay from './CardDisplay.jsx';
 import EditPrintingDetailsForm from './EditPrintingDetailsForm.jsx';
 import CreatePrintingForm from './CreatePrintingForm.jsx';
-import './CardDetailView.css'; 
+import EditPrintingForm from './EditPrintingForm.jsx'; 
+import './CardDetailView.css';
 
 function CardDetailView({ artworkInfo, onCollectionUpdated }) { 
   const [allPrintingsForCard, setAllPrintingsForCard] = useState([]);
   const [isLoadingPrintings, setIsLoadingPrintings] = useState(false);
   const [showAll, setShowAll] = useState(false); 
-  const [editingPrintingInfo, setEditingPrintingInfo] = useState(null); // Stocke les infos de l'impression à éditer
+  const [editingPrintingInfo, setEditingPrintingInfo] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [linkStatus, setLinkStatus] = useState({}); 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [printingToEdit, setPrintingToEdit] = useState(null);
+  const [isEditPrintingModalOpen, setIsEditPrintingModalOpen] = useState(false);
 
   const fetchPrintings = async () => {
     if (artworkInfo && artworkInfo.card_id) {
@@ -147,6 +150,42 @@ function CardDetailView({ artworkInfo, onCollectionUpdated }) {
     }
   };
 
+  const handleOpenEditPrintingModal = (printing) => {
+    setPrintingToEdit(printing);
+    setIsEditPrintingModalOpen(true);
+  };
+
+  const handleUpdatePrinting = async (updatedPrintingData) => {
+    try {
+      const result = await window.electronAPI.updateCardPrinting(updatedPrintingData);
+      if (result.success) {
+        setIsEditPrintingModalOpen(false);
+        fetchPrintings(); // Rafraîchir la liste
+      } else {
+        alert(`Erreur lors de la mise à jour: ${result.message}`);
+      }
+    } catch (error) {
+      alert(`Erreur: ${error.message}`);
+    }
+  };
+
+  const handleDeletePrinting = async (printingId, printingName) => {
+    const confirmation = window.confirm(`Êtes-vous sûr de vouloir supprimer l'impression "${printingName}" ? Cette action est irréversible et supprimera également les cartes de votre collection liées à cette impression.`);
+    if (confirmation) {
+      try {
+        const result = await window.electronAPI.deleteCardPrinting(printingId);
+        if (result.success) {
+          fetchPrintings(); // Rafraîchir la liste
+          if (onCollectionUpdated) onCollectionUpdated(); // Rafraichir la galerie si le total change
+        } else {
+          alert(`Erreur lors de la suppression: ${result.message}`);
+        }
+      } catch (error) {
+        alert(`Erreur: ${error.message}`);
+      }
+    }
+  };
+
   return (
     <div className="card-detail-content" style={cardViewStyle}> 
       <CardDisplay card={cardDataForDisplay} /> 
@@ -194,6 +233,12 @@ function CardDetailView({ artworkInfo, onCollectionUpdated }) {
                         x{p.owned_count_for_this_printing || 0} / x{p.wanted_count_for_this_printing || 0} / x{p.trade_count_for_this_printing || 0} 
                         <span className="edit-icon"> ✏️</span>
                     </button>
+                    <button onClick={() => handleOpenEditPrintingModal(p)} className="printing-action-button edit" title="Éditer les informations de cette impression (set, rareté...)">
+                      ⚙️
+                    </button>
+                    <button onClick={() => handleDeletePrinting(p.printing_id, `${p.set_name} - ${p.card_number_in_set}`)} className="printing-action-button delete" title="Supprimer définitivement cette impression">
+                      🗑️
+                    </button>
                   </div>
                 </div>
               </div>
@@ -218,6 +263,15 @@ function CardDetailView({ artworkInfo, onCollectionUpdated }) {
           artworkInfo={artworkInfo} // Pour pré-lier l'artwork
           onClose={() => setIsCreateModalOpen(false)}
           onSave={handleCreatePrinting}
+        />
+      )}
+
+      {isEditPrintingModalOpen && printingToEdit && (
+        <EditPrintingForm
+          key={`edit-printing-${printingToEdit.printing_id}`}
+          printingInfo={printingToEdit}
+          onClose={() => setIsEditPrintingModalOpen(false)}
+          onSave={handleUpdatePrinting}
         />
       )}
     </div>

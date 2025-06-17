@@ -4589,7 +4589,9 @@ function requireMain() {
     try {
       const sql = `
       SELECT
-          cp.id as printing_id, c.card_type as card_type,
+          cp.id as printing_id,
+          s.id as set_id,
+          c.card_type as card_type,
           c.id as card_id, c.name as card_name,
           s.set_name, s.set_code, cp.rarity, cp.edition, cp.language, cp.card_number_in_set,
           cp.artwork_variant_id as alternate_artwork_db_id, 
@@ -4607,8 +4609,8 @@ function requireMain() {
       FROM CardPrintings cp
       JOIN Cards c ON cp.card_id = c.id
       JOIN Sets s ON cp.set_id = s.id
-      LEFT JOIN UserCollectionItems uci ON uci.card_printing_id = cp.id AND uci.collection_status = 'Owned'
       WHERE cp.card_id = ?
+      GROUP BY cp.id
       ORDER BY
           s.release_date_tcg_na DESC, 
           s.release_date_ocg DESC,
@@ -4831,7 +4833,7 @@ function requireMain() {
     }
   });
   ipcMain.handle("update-card-printing", async (event, details) => {
-    const { printing_id, set_id, card_number_in_set, rarity, language, edition, alternate_artwork_id } = details;
+    const { printing_id, set_id, card_number_in_set, rarity, language, edition, artwork_variant_id } = details;
     if (!printing_id || !set_id || !card_number_in_set || !rarity) {
       return { success: false, message: "Données de mise à jour de l'impression incomplètes." };
     }
@@ -4844,11 +4846,10 @@ function requireMain() {
         card_number_in_set = ?,
         rarity = ?,
         language = ?,
-        edition = ?,
-        alternate_artwork_id = ?
+        edition = ?
       WHERE id = ?
     `);
-      const info = stmt.run(set_id, card_number_in_set, rarity, language, edition, alternate_artwork_id, printing_id);
+      const info = stmt.run(set_id, card_number_in_set, rarity, language, edition, printing_id);
       return { success: info.changes > 0, message: "Impression mise à jour avec succès." };
     } catch (error) {
       console.error(`[IPC:update-card-printing] Erreur pour printing_id ${printing_id}:`, error);
