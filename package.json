@@ -6,7 +6,6 @@
   "author": "TagCash <TagCashDev@gmail.com>",
   "description": "Une application pour gérer votre collection de cartes Yu-Gi-Oh!",
   "homepage": "./",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

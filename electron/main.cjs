@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, protocol } = require('electron');
+
 const path = require('path');
 const isDev = require('electron-is-dev');
+
 const { initDatabase, getDb } = require('./database.cjs');
 const { importAllCardData } = require('./dataImporter.cjs');
 
@@ -17,11 +19,14 @@ function createWindow() {
     },
   });
 
+  const loadURL = isDev
+    ? 'http://localhost:5173' // Le port par défaut de Vite
+    : `file://${path.join(__dirname, '../dist/index.html')}`;
+
+  mainWindow.loadURL(loadURL);
+
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
   mainWindow.on('closed', () => {

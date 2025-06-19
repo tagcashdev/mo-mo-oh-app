@@ -1,13 +1,14 @@
-import electron from "electron";
-import require$$1$1 from "path";
-import require$$0$1 from "fs";
-import require$$2$1 from "util";
-import Stream from "stream";
-import http from "http";
-import Url from "url";
-import require$$0$2 from "punycode";
-import https from "https";
-import zlib from "zlib";
+"use strict";
+const electron = require("electron");
+const require$$1$1 = require("path");
+const require$$0$1 = require("fs");
+const require$$2$1 = require("util");
+const Stream = require("stream");
+const http = require("http");
+const Url = require("url");
+const require$$0$2 = require("punycode");
+const https = require("https");
+const zlib = require("zlib");
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
@@ -129,7 +130,7 @@ var hasRequiredBindings;
 function requireBindings() {
   if (hasRequiredBindings) return bindings.exports;
   hasRequiredBindings = 1;
-  (function(module, exports) {
+  (function(module2, exports2) {
     var fs = require$$0$1, path = require$$1$1, fileURLToPath = requireFileUriToPath(), join = path.join, dirname = path.dirname, exists = fs.accessSync && function(path2) {
       try {
         fs.accessSync(path2);
@@ -179,7 +180,7 @@ function requireBindings() {
         if (!(i2 in opts)) opts[i2] = defaults[i2];
       });
       if (!opts.module_root) {
-        opts.module_root = exports.getRoot(exports.getFileName());
+        opts.module_root = exports2.getRoot(exports2.getFileName());
       }
       if (path.extname(opts.bindings) != ".node") {
         opts.bindings += ".node";
@@ -214,8 +215,8 @@ function requireBindings() {
       err.tries = tries;
       throw err;
     }
-    module.exports = exports = bindings2;
-    exports.getFileName = function getFileName(calling_file) {
+    module2.exports = exports2 = bindings2;
+    exports2.getFileName = function getFileName(calling_file) {
       var origPST = Error.prepareStackTrace, origSTL = Error.stackTraceLimit, dummy = {}, fileName;
       Error.stackTraceLimit = 10;
       Error.prepareStackTrace = function(e, st) {
@@ -242,7 +243,7 @@ function requireBindings() {
       }
       return fileName;
     };
-    exports.getRoot = function getRoot(file) {
+    exports2.getRoot = function getRoot(file) {
       var dir = dirname(file), prev;
       while (true) {
         if (dir === ".") {
@@ -1253,20 +1254,20 @@ var hasRequiredUtils;
 function requireUtils() {
   if (hasRequiredUtils) return utils.exports;
   hasRequiredUtils = 1;
-  (function(module) {
-    module.exports.mixin = function mixin(target, source) {
+  (function(module2) {
+    module2.exports.mixin = function mixin(target, source) {
       const keys = Object.getOwnPropertyNames(source);
       for (let i = 0; i < keys.length; ++i) {
         Object.defineProperty(target, keys[i], Object.getOwnPropertyDescriptor(source, keys[i]));
       }
     };
-    module.exports.wrapperSymbol = Symbol("wrapper");
-    module.exports.implSymbol = Symbol("impl");
-    module.exports.wrapperForImpl = function(impl) {
-      return impl[module.exports.wrapperSymbol];
+    module2.exports.wrapperSymbol = Symbol("wrapper");
+    module2.exports.implSymbol = Symbol("impl");
+    module2.exports.wrapperForImpl = function(impl) {
+      return impl[module2.exports.wrapperSymbol];
     };
-    module.exports.implForWrapper = function(wrapper) {
-      return wrapper[module.exports.implSymbol];
+    module2.exports.implForWrapper = function(wrapper) {
+      return wrapper[module2.exports.implSymbol];
     };
   })(utils);
   return utils.exports;
@@ -1439,7 +1440,7 @@ var hasRequiredUrlStateMachine;
 function requireUrlStateMachine() {
   if (hasRequiredUrlStateMachine) return urlStateMachine.exports;
   hasRequiredUrlStateMachine = 1;
-  (function(module) {
+  (function(module2) {
     const punycode = require$$0$2;
     const tr462 = requireTr46();
     const specialSchemes = {
@@ -2444,12 +2445,12 @@ function requireUrlStateMachine() {
       }
       return result;
     }
-    module.exports.serializeURL = serializeURL;
-    module.exports.serializeURLOrigin = function(url) {
+    module2.exports.serializeURL = serializeURL;
+    module2.exports.serializeURLOrigin = function(url) {
       switch (url.scheme) {
         case "blob":
           try {
-            return module.exports.serializeURLOrigin(module.exports.parseURL(url.path[0]));
+            return module2.exports.serializeURLOrigin(module2.exports.parseURL(url.path[0]));
           } catch (e) {
             return "null";
           }
@@ -2470,7 +2471,7 @@ function requireUrlStateMachine() {
           return "null";
       }
     };
-    module.exports.basicURLParse = function(input, options) {
+    module2.exports.basicURLParse = function(input, options) {
       if (options === void 0) {
         options = {};
       }
@@ -2480,30 +2481,30 @@ function requireUrlStateMachine() {
       }
       return usm.url;
     };
-    module.exports.setTheUsername = function(url, username) {
+    module2.exports.setTheUsername = function(url, username) {
       url.username = "";
       const decoded = punycode.ucs2.decode(username);
       for (let i = 0; i < decoded.length; ++i) {
         url.username += percentEncodeChar(decoded[i], isUserinfoPercentEncode);
       }
     };
-    module.exports.setThePassword = function(url, password) {
+    module2.exports.setThePassword = function(url, password) {
       url.password = "";
       const decoded = punycode.ucs2.decode(password);
       for (let i = 0; i < decoded.length; ++i) {
         url.password += percentEncodeChar(decoded[i], isUserinfoPercentEncode);
       }
     };
-    module.exports.serializeHost = serializeHost;
-    module.exports.cannotHaveAUsernamePasswordPort = cannotHaveAUsernamePasswordPort;
-    module.exports.serializeInteger = function(integer) {
+    module2.exports.serializeHost = serializeHost;
+    module2.exports.cannotHaveAUsernamePasswordPort = cannotHaveAUsernamePasswordPort;
+    module2.exports.serializeInteger = function(integer) {
       return String(integer);
     };
-    module.exports.parseURL = function(input, options) {
+    module2.exports.parseURL = function(input, options) {
       if (options === void 0) {
         options = {};
       }
-      return module.exports.basicURLParse(input, { baseURL: options.baseURL, encodingOverride: options.encodingOverride });
+      return module2.exports.basicURLParse(input, { baseURL: options.baseURL, encodingOverride: options.encodingOverride });
     };
   })(urlStateMachine);
   return urlStateMachine.exports;
@@ -2668,7 +2669,7 @@ var hasRequiredURL;
 function requireURL() {
   if (hasRequiredURL) return URL$2.exports;
   hasRequiredURL = 1;
-  (function(module) {
+  (function(module2) {
     const conversions = requireLib();
     const utils2 = requireUtils();
     const Impl = requireURLImpl();
@@ -2688,10 +2689,10 @@ function requireURL() {
       if (args[1] !== void 0) {
         args[1] = conversions["USVString"](args[1]);
       }
-      module.exports.setup(this, args);
+      module2.exports.setup(this, args);
     }
     URL2.prototype.toJSON = function toJSON() {
-      if (!this || !module.exports.is(this)) {
+      if (!this || !module2.exports.is(this)) {
         throw new TypeError("Illegal invocation");
       }
       const args = [];
@@ -2712,7 +2713,7 @@ function requireURL() {
       configurable: true
     });
     URL2.prototype.toString = function() {
-      if (!this || !module.exports.is(this)) {
+      if (!this || !module2.exports.is(this)) {
         throw new TypeError("Illegal invocation");
       }
       return this.href;
@@ -2823,7 +2824,7 @@ function requireURL() {
       enumerable: true,
       configurable: true
     });
-    module.exports = {
+    module2.exports = {
       is(obj) {
         return !!obj && obj[impl] instanceof Impl.implementation;
       },
@@ -4317,11 +4318,10 @@ function requireMain() {
         nodeIntegration: false
       }
     });
+    const loadURL = isDev2 ? "http://localhost:5173" : `file://${path.join(__dirname, "../dist/index.html")}`;
+    mainWindow.loadURL(loadURL);
     if (isDev2) {
-      mainWindow.loadURL("http://localhost:5173");
       mainWindow.webContents.openDevTools();
-    } else {
-      mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
     }
     mainWindow.on("closed", () => {
       mainWindow = null;
@@ -4932,6 +4932,4 @@ function requireMain() {
 }
 var mainExports = requireMain();
 const main = /* @__PURE__ */ getDefaultExportFromCjs(mainExports);
-export {
-  main as default
-};
+module.exports = main;

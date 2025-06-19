@@ -1,4 +1,5 @@
-import require$$0 from "electron";
+"use strict";
+const require$$0 = require("electron");
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
@@ -44,6 +45,4 @@ function requirePreload() {
 }
 var preloadExports = requirePreload();
 const preload = /* @__PURE__ */ getDefaultExportFromCjs(preloadExports);
-export {
-  preload as default
-};
+module.exports = preload;
