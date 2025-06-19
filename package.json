@@ -2,7 +2,7 @@
   "name": "mo-mo-oh-app",
   "private": true,
   "version": "1.0.0",
-  "main": "dist-electron/main/main.js",
+  "main": "electron/main.cjs",
   "author": "TagCash <TagCashDev@gmail.com>",
   "description": "Une application pour gérer votre collection de cartes Yu-Gi-Oh!",
   "homepage": "./",

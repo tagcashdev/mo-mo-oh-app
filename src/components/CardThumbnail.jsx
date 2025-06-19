@@ -44,7 +44,7 @@ function CardThumbnail({ artworkInfo, onCardClick }) {
         )}
       </div>
            
-      <div className="card-thumbnail-counters"> {/* Conteneur pour les compteurs */}
+      <div className="card-thumbnail-counters"> 
         <span className={`count-tag owned ${owned_count > 0 ? '' : 'zero'}`}>{owned_count || 0}</span>
         <span className={`count-tag wanted ${wanted_count > 0 ? '' : 'zero'}`}>{wanted_count || 0}</span>
         <span className={`count-tag trade ${trade_count > 0 ? '' : 'zero'}`}>{trade_count || 0}</span>

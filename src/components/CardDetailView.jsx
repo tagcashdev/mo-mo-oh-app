@@ -228,10 +228,10 @@ function CardDetailView({ artworkInfo, onCollectionUpdated }) {
                     <span className="rarity-details">{p.rarity} - {p.language} {p.edition && `(${p.edition})`}</span>
                   </div>
                   <div className="printing-collection-controls">
-                    <div class="card-thumbnail-counters"> 
-                      <span class="count-tag owned ">{p.owned_count_for_this_printing || 0}</span>
-                      <span class="count-tag wanted ">{p.wanted_count_for_this_printing || 0}</span>
-                      <span class="count-tag trade ">{p.trade_count_for_this_printing || 0}</span>
+                    <div className="card-thumbnail-counters"> 
+                      <span className="count-tag owned">{p.owned_count_for_this_printing || 0}</span>
+                      <span className="count-tag wanted">{p.wanted_count_for_this_printing || 0}</span>
+                      <span className="count-tag trade">{p.trade_count_for_this_printing || 0}</span>
                     </div>
                     <button onClick={() => openEditModal(p)} className="edit-collection-button" title="Modifier la collection pour cette impression">
                         <span className="edit-icon"> ✏️</span>
