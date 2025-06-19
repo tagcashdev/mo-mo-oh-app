@@ -7,13 +7,14 @@ import FilterSidebar from './components/FilterSidebar.jsx';
 import './App.css';
 
 import ExtensionPage from './pages/ExtensionPage.jsx';
+import DatabasePage from './pages/DatabasePage.jsx';
 
 function App() {
   const [displayedArtworks, setDisplayedArtworks] = useState([]);
   const [selectedArtworkInfo, setSelectedArtworkInfo] = useState(null); 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 20; 
+  const itemsPerPage = 50; 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCardType, setSelectedCardType] = useState('');
   const [searchTerm, setSearchTerm] = useState('');

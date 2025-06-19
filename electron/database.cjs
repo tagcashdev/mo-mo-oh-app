@@ -85,7 +85,7 @@ function createSchema() {
     CREATE TABLE IF NOT EXISTS Sets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       set_name TEXT NOT NULL,
-      set_code TEXT NOT NULL UNIQUE,
+      set_code TEXT NOT NULL,
       release_date_tcg_na TEXT,
       release_date_tcg_eu TEXT,
       release_date_ocg TEXT,

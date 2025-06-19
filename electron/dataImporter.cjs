@@ -237,6 +237,7 @@ async function importAllCardData(mainWindow) {
         }
 
         // Impressions (Card Sets)
+        /*
         if (cardData.card_sets && Array.isArray(cardData.card_sets)) {
           for (const setPrint of cardData.card_sets) {
             const setId = findOrCreateSet(db, { set_name: setPrint.set_name, set_code: setPrint.set_code });
@@ -252,6 +253,7 @@ async function importAllCardData(mainWindow) {
             }
           }
         }
+        */
 
         // Artworks Alternatifs (le premier est déjà main_artwork_path)
         if (cardData.card_images && cardData.card_images.length > 1) {

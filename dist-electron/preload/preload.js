@@ -1,44 +1,44 @@
-import require$$0 from "electron";
-function getDefaultExportFromCjs(x) {
-  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
+import l from "electron";
+function d(t) {
+  return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
 }
-var preload$1 = {};
-var hasRequiredPreload;
-function requirePreload() {
-  if (hasRequiredPreload) return preload$1;
-  hasRequiredPreload = 1;
-  const { contextBridge, ipcRenderer } = require$$0;
-  contextBridge.exposeInMainWorld("electronAPI", {
+var i = {}, s;
+function p() {
+  if (s) return i;
+  s = 1;
+  const { contextBridge: t, ipcRenderer: r } = l;
+  return t.exposeInMainWorld("electronAPI", {
     // --- Galerie principale ---
-    getCards: (args) => ipcRenderer.invoke("get-cards", args),
-    getDistinctCardTypes: () => ipcRenderer.invoke("get-distinct-card-types"),
+    getCards: (e) => r.invoke("get-cards", e),
+    getDistinctCardTypes: () => r.invoke("get-distinct-card-types"),
     // --- Vue détaillée ---
-    getPrintingsForCardDetails: (cardId) => ipcRenderer.invoke("get-printings-for-card-details", cardId),
-    getCollectionItemsForPrinting: (printingId) => ipcRenderer.invoke("get-collection-items-for-printing", printingId),
+    getPrintingsForCardDetails: (e) => r.invoke("get-printings-for-card-details", e),
+    getCollectionItemsForPrinting: (e) => r.invoke("get-collection-items-for-printing", e),
     // --- Actions sur une impression spécifique ---
-    updatePrintingArtworkLink: (args) => ipcRenderer.invoke("update-printing-artwork-link", args),
-    savePrintingCollectionDetails: (args) => ipcRenderer.invoke("save-printing-collection-details", args),
-    createCardPrinting: (args) => ipcRenderer.invoke("create-card-printing", args),
-    searchSets: (query) => ipcRenderer.invoke("search-sets", query),
+    updatePrintingArtworkLink: (e) => r.invoke("update-printing-artwork-link", e),
+    savePrintingCollectionDetails: (e) => r.invoke("save-printing-collection-details", e),
+    createCardPrinting: (e) => r.invoke("create-card-printing", e),
+    searchSets: (e) => r.invoke("search-sets", e),
     // NOUVEAUX HANDLERS POUR L'ÉDITION/SUPPRESSION D'IMPRESSIONS
-    getAlternateArtworksForCard: (cardId) => ipcRenderer.invoke("get-alternate-artworks-for-card", cardId),
-    updateCardPrinting: (details) => ipcRenderer.invoke("update-card-printing", details),
-    deleteCardPrinting: (printingId) => ipcRenderer.invoke("delete-card-printing", printingId),
+    getAlternateArtworksForCard: (e) => r.invoke("get-alternate-artworks-for-card", e),
+    updateCardPrinting: (e) => r.invoke("update-card-printing", e),
+    deleteCardPrinting: (e) => r.invoke("delete-card-printing", e),
     // --- Importation ---
-    importAllCards: () => ipcRenderer.invoke("import-all-cards"),
-    importAllSetsAndPrintings: () => ipcRenderer.invoke("import-all-sets-and-printings"),
-    getAllSets: () => ipcRenderer.invoke("get-all-sets"),
-    onImportProgress: (callback) => {
-      const handler = (_event, value) => callback(value);
-      ipcRenderer.on("import-progress", handler);
-      return () => ipcRenderer.removeListener("import-progress", handler);
+    importAllCards: () => r.invoke("import-all-cards"),
+    importAllSetsAndPrintings: () => r.invoke("import-all-sets-and-printings"),
+    getAllSets: (e) => r.invoke("get-all-sets", e),
+    onImportProgress: (e) => {
+      const n = (a, o) => e(o);
+      return r.on("import-progress", n), () => r.removeListener("import-progress", n);
+    },
+    onSetImportProgress: (e) => {
+      const n = (a, o) => e(o);
+      return r.on("set-import-progress", n), () => r.removeListener("set-import-progress", n);
     }
-  });
-  console.log("[Preload] electronAPI exposé sur window.");
-  return preload$1;
+  }), console.log("[Preload] electronAPI exposé sur window."), i;
 }
-var preloadExports = requirePreload();
-const preload = /* @__PURE__ */ getDefaultExportFromCjs(preloadExports);
+var g = p();
+const v = /* @__PURE__ */ d(g);
 export {
-  preload as default
+  v as default
 };

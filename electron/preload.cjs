@@ -25,11 +25,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // --- Importation ---
   importAllCards: () => ipcRenderer.invoke('import-all-cards'),
   importAllSetsAndPrintings: () => ipcRenderer.invoke("import-all-sets-and-printings"),
-  getAllSets: () => ipcRenderer.invoke("get-all-sets"),
+  getAllSets: (params) => ipcRenderer.invoke("get-all-sets", params),
   onImportProgress: (callback) => {
     const handler = (_event, value) => callback(value);
     ipcRenderer.on('import-progress', handler);
     return () => ipcRenderer.removeListener('import-progress', handler);
+  },
+
+  onSetImportProgress: (callback) => {
+    const handler = (_event, value) => callback(value);
+    ipcRenderer.on('set-import-progress', handler);
+    return () => ipcRenderer.removeListener('set-import-progress', handler);
   }
 });
 

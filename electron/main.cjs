@@ -629,22 +629,32 @@ ipcMain.handle('delete-card-printing', async (event, printingId) => {
 });
 
 // Pour récupérer tous les sets de la base de données
-ipcMain.handle("get-all-sets", async () => {
+ipcMain.handle("get-all-sets", async (event, { page = 1, limit = 20 } = {}) => {
   const db = getDb();
   try {
+    const offset = (page - 1) * limit;
+
+    // NOUVEAU: Une première requête pour obtenir le nombre total de sets
+    const totalStmt = db.prepare(`SELECT COUNT(*) as total FROM Sets WHERE set_type <> 'hidden'`);
+    const totalResult = totalStmt.get();
+    const totalSets = totalResult.total;
+    
     // On récupère aussi le nombre de cartes imprimées pour chaque set
     const stmt = db.prepare(`
       SELECT 
         s.*, 
         (SELECT COUNT(*) FROM CardPrintings cp WHERE cp.set_id = s.id) as card_count
       FROM Sets s 
-      ORDER BY s.release_date_tcg_na DESC, s.set_name ASC
+      WHERE set_type <> 'hidden'
+      ORDER BY s.release_date_tcg_na ASC, s.set_name ASC
+      LIMIT ? OFFSET ?
     `);
-    const sets = stmt.all();
-    return { success: true, data: sets };
+    const sets = stmt.all(limit, offset);
+
+    return { success: true, data: { sets: sets, total: totalSets } };
   } catch (error) {
     console.error("[get-all-sets] Erreur:", error);
-    return { success: false, message: error.message, data: [] };
+    return { success: false, message: error.message, data: { sets: [], total: 0 } };
   }
 });
 
@@ -655,8 +665,7 @@ ipcMain.handle("import-all-sets-and-printings", async (event) => {
 
   function sendProgress(message, progress = null, total = null) {
     if (mainWindow && !mainWindow.isDestroyed()) {
-      // Nous utiliserons le même canal de progression pour simplifier
-      mainWindow.webContents.send("import-progress", { message, progress, total });
+      mainWindow.webContents.send("set-import-progress", { message, progress, total });
     }
     console.log(message);
   }
@@ -670,15 +679,16 @@ ipcMain.handle("import-all-sets-and-printings", async (event) => {
     if (!response.ok) throw new Error('Impossible de récupérer la liste des sets.');
     
     const allApiSets = await response.json();
-    sendProgress(`${allApiSets.length} sets trouvés dans l'API.`);
+    const totalApiSets = allApiSets.length;
+    sendProgress(`Récupération de la liste complète des sets...`, 0, totalApiSets);
 
-    const findSetStmt = db.prepare("SELECT id FROM Sets WHERE set_code = ?");
+    const findSetStmt = db.prepare("SELECT id FROM Sets WHERE set_code = ? and set_name = ?");
     const insertSetStmt = db.prepare("INSERT INTO Sets (set_name, set_code, release_date_tcg_na, total_cards, set_type) VALUES (@set_name, @set_code, @tcg_date, @num_of_cards, 'Unknown')");
     
     // 2. Mettre à jour la table Sets
     db.transaction(() => {
         for (const set of allApiSets) {
-            const existingSet = findSetStmt.get(set.set_code);
+            const existingSet = findSetStmt.get(set.set_code, set.set_name);
             if (!existingSet) {
                 insertSetStmt.run(set);
             }
@@ -687,6 +697,7 @@ ipcMain.handle("import-all-sets-and-printings", async (event) => {
     sendProgress("Table 'Sets' mise à jour avec les nouvelles extensions.");
 
     // 3. Boucler sur chaque set pour importer les impressions
+
     let setsProcessed = 0;
     const findCardByApiIdStmt = db.prepare("SELECT id FROM Cards WHERE api_card_id = ?");
     const findPrintingStmt = db.prepare("SELECT id FROM CardPrintings WHERE card_id = ? AND set_id = ? AND card_number_in_set = ? AND rarity = ?");
@@ -694,9 +705,9 @@ ipcMain.handle("import-all-sets-and-printings", async (event) => {
 
     for (const apiSet of allApiSets) {
         setsProcessed++;
-        sendProgress(`Traitement du set ${setsProcessed}/${allApiSets.length}: ${apiSet.set_name}`);
+        sendProgress(`Traitement : ${apiSet.set_name}`, setsProcessed, totalApiSets);
         
-        const setInDb = findSetStmt.get(apiSet.set_code);
+        const setInDb = findSetStmt.get(apiSet.set_code, apiSet.set_name);
         if (!setInDb) continue; // Ne devrait pas arriver, mais par sécurité
 
         const cardsInSetResponse = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(apiSet.set_name)}`);

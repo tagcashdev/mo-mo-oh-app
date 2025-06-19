@@ -224,7 +224,7 @@ function CardDetailView({ artworkInfo, onCollectionUpdated }) {
                 </div>
                 <div className="printing-item">
                   <div className="printing-info">
-                    <span className="set-name">{p.set_name} ({p.set_code})</span>
+                    <span className="set-name">{p.set_name} ({p.card_number_in_set})</span>
                     <span className="rarity-details">{p.rarity} - {p.language} {p.edition && `(${p.edition})`}</span>
                   </div>
                   <div className="printing-collection-controls">
