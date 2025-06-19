@@ -1,32 +1,35 @@
-// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import electron from 'vite-plugin-electron';
+
+const externals = [ 'electron', 'better-sqlite3', 'path', 'fs', 'util', 'stream', 'http', 'https', 'url', 'zlib' ];
 
 export default defineConfig({
   plugins: [
     react(),
     electron([
       {
-        // Fichier d'entrée pour le processus principal
-        entry: 'electron/main.cjs', 
-        // Configuration pour la sortie (optionnel, le plugin déduit souvent)
+        entry: 'electron/main.cjs',
         vite: {
           build: {
-            outDir: 'dist-electron/main', // Ou juste 'dist-electron' si le plugin gère le nom
+            outDir: 'dist-electron/main',
+            rollupOptions: {
+              external: externals,
+            },
           },
         },
       },
       {
-        // Fichier d'entrée pour le script de préchargement
         entry: 'electron/preload.cjs',
         onstart(options) {
-          // Permet au script de préchargement de se recharger lorsque vous le modifiez
           options.reload();
         },
         vite: {
           build: {
-            outDir: 'dist-electron/preload', // Ou juste 'dist-electron'
+            outDir: 'dist-electron/preload',
+            rollupOptions: {
+              external: externals,
+            },
           },
         },
       },
@@ -34,6 +37,6 @@ export default defineConfig({
   ],
   base: './',
   build: {
-    outDir: 'dist' // Pour la partie renderer (React)
+    outDir: 'dist'
   }
 });

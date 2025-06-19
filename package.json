@@ -43,11 +43,11 @@
     "vite-plugin-electron": "^0.29.0"
   },
   "build": {
-    "appId": "com.votre-nom.momooh",
-    "productName": "Mo-Mo-Oh!",
+    "appId": "com.tagcash.momooh",
+    "productName": "Mo-Mo-Oh",
     "files": [
-      "dist/**/*",
-      "dist-electron/**/*"
+      "dist/",
+      "electron/"
     ],
     "directories": {
       "buildResources": "assets",
