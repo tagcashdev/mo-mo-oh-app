@@ -2,7 +2,7 @@
   "name": "mo-mo-oh-app",
   "private": true,
   "version": "1.0.0",
-  "main": "electron/main.cjs",
+  "main": "dist-electron/main/main.js",
   "author": "TagCash <TagCashDev@gmail.com>",
   "description": "Une application pour gérer votre collection de cartes Yu-Gi-Oh!",
   "homepage": "./",
@@ -14,8 +14,9 @@
     "electron:start": "electron .",
     "start": "concurrently \"npm run dev\" \"npm run electron:dev-wait\"",
     "electron:dev-wait": "cross-env NODE_ENV=development electron . --inspect",
-    "electron:build": "vite build && npx electron-builder",
-    "rebuild": "electron-rebuild -f -w better-sqlite3"
+    "electron:build": "vite build && electron-builder",
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
     "better-sqlite3": "^11.10.0",
@@ -47,7 +48,7 @@
     "productName": "Mo-Mo-Oh",
     "files": [
       "dist/",
-      "electron/"
+      "dist-electron/"
     ],
     "directories": {
       "buildResources": "assets",
